@@ -1472,11 +1472,6 @@ class MusicBot(discord.Client):
         if player.is_stopped:
             raise exceptions.CommandError("Can't skip! The player is not playing!", expire_in=20)
 
-        if (author.id != self.config.owner_id
-                or not permissions.instaskip
-                or author != player.current_entry.meta.get('author', None)):
-            raise exceptions.CommandError("You are not allowed to use this command", expire_in=10)
-
         if not player.current_entry:
             if player.playlist.peek():
                 if player.playlist.peek()._is_downloading:
@@ -1492,10 +1487,15 @@ class MusicBot(discord.Client):
                 print("Something strange is happening.  "                                                                                                                                                 
                       "You might want to restart the bot if it doesn't start working.")
 
-        now_playing = player.current_entry.title
+        if author.id == self.config.owner_id \
+                or permissions.instaskip \
+                or author == player.current_entry.meta.get('author', None):
+            player.skip()  # check autopause stuff here
+            await self._manual_delete_check(message)
+        else:
+            raise exceptions.CommandError("You are not allowed to use this command", expire_in=10)
 
-        player.skip()  # check autopause stuff here
-        await self._manual_delete_check(message)
+        now_playing = player.current_entry.title
 
         return Response(
             'your instaskip for **{}** was acknowledged. {}'.format(
