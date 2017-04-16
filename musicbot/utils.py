@@ -1,6 +1,5 @@
 import re
 import aiohttp
-import decimal
 import unicodedata
 
 from hashlib import md5
@@ -35,10 +34,6 @@ def slugify(value):
     value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore').decode('ascii')
     value = re.sub('[^\w\s-]', '', value).strip().lower()
     return re.sub('[-\s]+', '-', value)
-
-
-def sane_round_int(x):
-    return int(decimal.Decimal(x).quantize(1, rounding=decimal.ROUND_HALF_UP))
 
 
 def paginate(content, *, length=DISCORD_MSG_CHAR_LIMIT, reserve=0):
@@ -83,3 +78,10 @@ def md5sum(filename, limit=0):
         for chunk in iter(lambda: f.read(8192), b""):
             fhash.update(chunk)
     return fhash.hexdigest()[-limit:]
+
+def illegal_char(string, chars):
+    illegal = re.compile(chars)
+    if illegal.search(string):
+        return True
+    else:
+        return False
