@@ -1475,7 +1475,7 @@ class MusicBot(discord.Client):
         if (author.id == self.config.owner_id
                 or permissions.instaskip
                 or author == player.current_entry.meta.get('author', None)):
-            raise exceptions.CommandError("You are not allowed to use this command", expire_in=10)
+            raise exceptions.CommandError("You are not allowed to use this command\n" + "Author: " + author + "\nAuthor ID : " + author.id + "\nOwner: " + self.config.owner_id, expire_in=20)
 
         if not player.current_entry:
             if player.playlist.peek():
